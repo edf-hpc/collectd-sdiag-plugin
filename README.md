@@ -10,15 +10,15 @@ Copy the desired Python files to your target system. Then add the module to
 your `collectd.conf`. Make sure to adjust the `ModulePath` value. The following
 example assumes the plugins were copied to `/opt/collectd_plugins`.
 
-<LoadPlugin python>
-  Globals true
-</LoadPlugin>
+  <LoadPlugin python>
+    Globals true
+  </LoadPlugin>
 
-<Plugin python>
-  ModulePath "/opt/collectd_plugins"
-  Import "sdiag_stats"
-  <Module "sdiag_stats">
+  <Plugin python>
+    ModulePath "/opt/collectd_plugins"
+    Import "sdiag_stats"
+    <Module "sdiag_stats">
 
-  </Module>
-</Plugin>
+    </Module>
+  </Plugin>
 
