@@ -90,22 +90,19 @@ def get_stats(debug=False):
     stats["bf_last_depth_cycle"] = sdiag.get("bf_last_depth")
     stats["bf_last_depth_cycle_try"] = sdiag.get("bf_last_depth_try")
 
-    # Rpc per user stats
-    for k, v in sdiag.get("rpc_user_stats").items():
-        for h, u in v.items():
-            if ( str(h) != 'id'):
-                if debug is True:
-                    print k, "-->", h, "-->", u
-                metric = str(k) + "-" + str(h)
-                stats[metric] = u
-    # RPC message stats
-    for k, v in sdiag.get("rpc_type_stats").items():
-        for h, u in v.items():
-            if ( str(h) != 'id'):
-                if debug is True:
-                    print k, "-->", h, "-->", u
-                metric = str(k) + "-" + str(h)
-                stats[metric] = u
+    # RPC users stats
+    for user, u_metrics in sdiag.get("rpc_user_stats").items():
+        for m_name, m_value in u_metrics.items():
+            if m_name != 'id':
+                metric = "rpc_user_" + str(user) + "_" + m_name
+                stats[metric] = m_value
+
+    # RPC types stats
+    for rpc_type, rpc_metrics in sdiag.get("rpc_type_stats").items():
+        for m_name, m_value in rpc_metrics.items():
+            if m_name != 'id':
+                metric = "rpc_type_" + str(rpc_type) + "-" + m_name
+                stats[metric] = m_value
 
     return stats
 
