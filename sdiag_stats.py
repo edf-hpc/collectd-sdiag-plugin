@@ -113,7 +113,9 @@ def read():
     """Read callback for collectd."""
 
     stats = get_stats()
-    if stats is not None:
+    if stats is None:
+        collectd.warning("unable to get statistics from slurm")
+    else:
         # Dispatch values to collectd
         for k , v in stats.items():
             v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",type_instance=k)
