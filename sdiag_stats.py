@@ -92,10 +92,17 @@ def get_stats(debug=False):
 
     # RPC users stats
     for user, u_metrics in sdiag.get("rpc_user_stats").items():
-        for m_name, m_value in u_metrics.items():
-            if m_name != 'id':
-                metric = "rpc_user_" + str(user) + "_" + m_name
-                stats[metric] = m_value
+        if user not in ['root', 'slurm']:
+            user = 'users'
+        metric_prefix = 'rpc_user_' + user + '_'
+        if metric_prefix + 'count' in stats:
+            stats[metric_prefix + 'count'] += u_metrics[u'count']
+            stats[metric_prefix + 'total_time'] += u_metrics[u'total_time']
+            stats[metric_prefix + 'ave_time'] = stats[metric_prefix + 'total_time'] / stats[metric_prefix + 'count']
+        else:
+            stats[metric_prefix + 'count'] = u_metrics[u'count']
+            stats[metric_prefix + 'total_time'] = u_metrics[u'total_time']
+            stats[metric_prefix + 'ave_time'] = stats[metric_prefix + 'total_time'] / stats[metric_prefix + 'count']
 
     # RPC types stats
     for rpc_type, rpc_metrics in sdiag.get("rpc_type_stats").items():
