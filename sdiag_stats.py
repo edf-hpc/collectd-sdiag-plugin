@@ -21,18 +21,17 @@
 # along with collectd-sdiag-plugin.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-import collectd
 import pyslurm
 
-def read():
-# Get sdiag stats
+
+def get_stats(debug=False):
 
     stats = {}
 
     try:
         sdiag = pyslurm.statistics().get()
     except:
-        return
+        return None
 
     # Slurmctld Stats
     stats["server_thread_count"] = sdiag.get("server_thread_count")
@@ -95,21 +94,50 @@ def read():
     for k, v in sdiag.get("rpc_user_stats").items():
         for h, u in v.items():
             if ( str(h) != 'id'):
-                print k, "-->", h, "-->", u
+                if debug is True:
+                    print k, "-->", h, "-->", u
                 metric = str(k) + "-" + str(h)
                 stats[metric] = u
     # RPC message stats
     for k, v in sdiag.get("rpc_type_stats").items():
         for h, u in v.items():
             if ( str(h) != 'id'):
-                print k, "-->", h, "-->", u
+                if debug is True:
+                    print k, "-->", h, "-->", u
                 metric = str(k) + "-" + str(h)
                 stats[metric] = u
 
-    # Dispatch values to collectd
-    for k , v in stats.items():
-        print k, "-->", v
-        v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",type_instance=k)
-        v_tmp.dispatch(values=[v])
+    return stats
 
-collectd.register_read(read)
+def read():
+    """Read callback for collectd."""
+
+    stats = get_stats()
+    if stats is not None:
+        # Dispatch values to collectd
+        for k , v in stats.items():
+            v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",type_instance=k)
+            v_tmp.dispatch(values=[v])
+
+
+def print_metrics(debug):
+    """Read and print metrics when script is run on cmdline."""
+
+    stats = get_stats(debug)
+    if stats is not None:
+        # Dispatch values to collectd
+        for k , v in sorted(stats.items()):
+            print("sdiag_stats.%-30s -> %d" % (k, v))
+
+
+if __name__ == '__main__':
+    # script is run on cmdline, pretty-print collected metrics
+    import sys
+    debug = False
+    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
+        debug = True
+    print_metrics(debug)
+else:
+    # script is loaded by collectd, register callback
+    import collectd
+    collectd.register_read(read)
