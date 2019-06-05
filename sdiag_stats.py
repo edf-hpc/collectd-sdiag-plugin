@@ -88,28 +88,28 @@ def read():
                 sdiag.get("bf_queue_len_sum") / sdiag.get("bf_cycle_counter")
             )
 
-	stats["bf_last_depth_cycle"] = sdiag.get("bf_last_depth")
-	stats["bf_last_depth_cycle_try"] = sdiag.get("bf_last_depth_try")
-	
-	# Rpc per user stats
-	for k, v in sdiag.get("rpc_user_stats").items():
-		for h, u in v.items():
-			if ( str(h) != 'id'):
-				print k, "-->", h, "-->", u
-				metric = str(k) + "-" + str(h)
-				stats[metric] = u
-	# RPC message stats
-	for k, v in sdiag.get("rpc_type_stats").items():
-                for h, u in v.items():
-			if ( str(h) != 'id'):
-                		print k, "-->", h, "-->", u
-                        	metric = str(k) + "-" + str(h)
-                        	stats[metric] = u		
-	
-	# Dispatch values to collectd
-	for k , v in stats.items():
-		print k, "-->", v
-		v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",type_instance=k)
-		v_tmp.dispatch(values=[v])
-	
+        stats["bf_last_depth_cycle"] = sdiag.get("bf_last_depth")
+        stats["bf_last_depth_cycle_try"] = sdiag.get("bf_last_depth_try")
+
+        # Rpc per user stats
+        for k, v in sdiag.get("rpc_user_stats").items():
+            for h, u in v.items():
+                if ( str(h) != 'id'):
+                    print k, "-->", h, "-->", u
+                    metric = str(k) + "-" + str(h)
+                    stats[metric] = u
+        # RPC message stats
+        for k, v in sdiag.get("rpc_type_stats").items():
+            for h, u in v.items():
+                if ( str(h) != 'id'):
+                    print k, "-->", h, "-->", u
+                    metric = str(k) + "-" + str(h)
+                    stats[metric] = u
+
+        # Dispatch values to collectd
+        for k , v in stats.items():
+            print k, "-->", v
+            v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",type_instance=k)
+            v_tmp.dispatch(values=[v])
+
 collectd.register_read(read)
