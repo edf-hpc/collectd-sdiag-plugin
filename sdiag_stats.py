@@ -111,6 +111,12 @@ def get_stats(debug=False):
                 metric = "rpc_type_" + str(rpc_type) + "-" + m_name
                 stats[metric] = m_value
 
+    # global pending RPC
+    metric = 'rpc_pending'
+    stats[metric] = 0
+    for rpc_type, rpc_metrics in sdiag.get("rpc_queue_stats").items():
+        stats[metric] += rpc_metrics[u'count']
+
     return stats
 
 def read():
