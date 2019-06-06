@@ -105,17 +105,18 @@ def get_stats(debug=False):
             stats[metric_prefix + 'ave_time'] = stats[metric_prefix + 'total_time'] / stats[metric_prefix + 'count']
 
     # RPC types stats
-    for rpc_type, rpc_metrics in sdiag.get("rpc_type_stats").items():
+    for rpc_type, rpc_metrics in sdiag.get('rpc_type_stats').items():
         for m_name, m_value in rpc_metrics.items():
             if m_name != 'id':
-                metric = "rpc_type_" + str(rpc_type) + "-" + m_name
+                metric = 'rpc_type_' + str(rpc_type) + '-' + m_name
                 stats[metric] = m_value
 
-    # global pending RPC
-    metric = 'rpc_pending'
-    stats[metric] = 0
-    for rpc_type, rpc_metrics in sdiag.get("rpc_queue_stats").items():
-        stats[metric] += rpc_metrics[u'count']
+    # pending RPC by type and sum global pending RPC counter
+    metric_global = 'rpc_pending_global'
+    stats[metric_global] = 0
+    for rpc_type, rpc_metrics in sdiag.get('rpc_queue_stats').items():
+        stats[metric_global] += rpc_metrics[u'count']
+        stats['rpc_pending_' + rpc_type ] = rpc_metrics[u'count']
 
     return stats
 
