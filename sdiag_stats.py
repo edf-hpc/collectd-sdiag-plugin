@@ -36,6 +36,7 @@ def get_stats(debug=False):
     # Slurmctld Stats
     stats["server_thread_count"] = sdiag.get("server_thread_count")
     stats["agent_queue_size"] = sdiag.get("agent_queue_size")
+    stats["dbd_agent_queue_size"] = sdiag.get("dbd_agent_queue_size")
 
     # Jobs Stats
     stats["jobs_submitted"] = sdiag.get("jobs_submitted")
