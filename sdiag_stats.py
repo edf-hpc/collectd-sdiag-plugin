@@ -50,24 +50,25 @@ def get_stats(debug=False):
     stats["main_total_cycles"] = sdiag.get("schedule_cycle_counter")
 
     if sdiag.get("schedule_cycle_counter") > 0:
-        stats["main_mean_cycle"] = (
-            sdiag.get("schedule_cycle_sum") / sdiag.get("schedule_cycle_counter")
-        )
-        stats["main_mean_depth_cycle"] = (
-            sdiag.get("schedule_cycle_depth") / sdiag.get("schedule_cycle_counter")
-        )
+        stats["main_mean_cycle"] = \
+            sdiag.get("schedule_cycle_sum") / \
+            sdiag.get("schedule_cycle_counter")
+        stats["main_mean_depth_cycle"] = \
+            sdiag.get("schedule_cycle_depth") / \
+            sdiag.get("schedule_cycle_counter")
 
     if (sdiag.get("req_time") - sdiag.get("req_time_start")) > 60:
-        stats["main_cycles_per_minute"] = (
-            sdiag.get("schedule_cycle_counter") /
+        stats["main_cycles_per_minute"] = \
+            sdiag.get("schedule_cycle_counter") / \
             ((sdiag.get("req_time") - sdiag.get("req_time_start")) / 60)
-        )
 
     stats["main_last_queue_length"] = sdiag.get("schedule_queue_len")
 
     # Backfilling stats
-    stats["bf_total_jobs_since_slurm_start"] = sdiag.get("bf_backfilled_jobs")
-    stats["bf_total_jobs_since_cycle_start"] = sdiag.get("bf_last_backfilled_jobs")
+    stats["bf_total_jobs_since_slurm_start"] = \
+        sdiag.get("bf_backfilled_jobs")
+    stats["bf_total_jobs_since_cycle_start"] = \
+        sdiag.get("bf_last_backfilled_jobs")
     stats["bf_total_cycles"] = sdiag.get("bf_cycle_counter")
     stats["bf_last_cycle"] = sdiag.get("bf_cycle_last")
     stats["bf_max_cycle"] = sdiag.get("bf_cycle_max")
@@ -98,11 +99,15 @@ def get_stats(debug=False):
         if metric_prefix + 'count' in stats:
             stats[metric_prefix + 'count'] += u_metrics[u'count']
             stats[metric_prefix + 'total_time'] += u_metrics[u'total_time']
-            stats[metric_prefix + 'ave_time'] = stats[metric_prefix + 'total_time'] / stats[metric_prefix + 'count']
+            stats[metric_prefix + 'ave_time'] = \
+                stats[metric_prefix + 'total_time'] / \
+                stats[metric_prefix + 'count']
         else:
             stats[metric_prefix + 'count'] = u_metrics[u'count']
             stats[metric_prefix + 'total_time'] = u_metrics[u'total_time']
-            stats[metric_prefix + 'ave_time'] = stats[metric_prefix + 'total_time'] / stats[metric_prefix + 'count']
+            stats[metric_prefix + 'ave_time'] = \
+                stats[metric_prefix + 'total_time'] / \
+                stats[metric_prefix + 'count']
 
     # RPC types stats
     for rpc_type, rpc_metrics in sdiag.get('rpc_type_stats').items():
@@ -116,9 +121,10 @@ def get_stats(debug=False):
     stats[metric_global] = 0
     for rpc_type, rpc_metrics in sdiag.get('rpc_queue_stats').items():
         stats[metric_global] += rpc_metrics[u'count']
-        stats['rpc_pending_' + rpc_type ] = rpc_metrics[u'count']
+        stats['rpc_pending_' + rpc_type] = rpc_metrics[u'count']
 
     return stats
+
 
 def read():
     """Read callback for collectd."""
@@ -128,8 +134,9 @@ def read():
         collectd.warning("unable to get statistics from slurm")
     else:
         # Dispatch values to collectd
-        for k , v in stats.items():
-            v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",type_instance=k)
+        for k, v in stats.items():
+            v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",
+                                    type_instance=k)
             v_tmp.dispatch(values=[v])
 
 
@@ -139,7 +146,7 @@ def print_metrics(debug):
     stats = get_stats(debug)
     if stats is not None:
         # Dispatch values to collectd
-        for k , v in sorted(stats.items()):
+        for k, v in sorted(stats.items()):
             print("sdiag_stats.%-30s -> %d" % (k, v))
 
 
