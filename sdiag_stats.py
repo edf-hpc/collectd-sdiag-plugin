@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2019 EDF SA
+# Copyright (C) 2020 EDF SA
 #
 # Authors: CCN - HPC <dsp-cspit-ccn-hpc@edf.fr>
 #
@@ -22,16 +22,20 @@
 # <http://www.gnu.org/licenses/>.
 
 import pyslurm
-
+import time
 
 def get_stats(debug=False):
 
     stats = {}
-
+    time_before = time.time()
     try:
         sdiag = pyslurm.statistics().get()
     except:
         return None
+    time_after = time.time()
+
+    # Plugin Stats
+    stats["stats_get_time"] = time_after - time_before
 
     # Slurmctld Stats
     stats["server_thread_count"] = sdiag.get("server_thread_count")
