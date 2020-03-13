@@ -98,18 +98,15 @@ def get_stats(debug=False):
 
     # RPC users stats
     for user, u_metrics in sdiag.get("rpc_user_stats").items():
+        metric_prefixes = ['rpc_user_' + user + '_']
         if user not in ['root', 'slurm']:
-            user = 'users'
-        metric_prefix = 'rpc_user_' + user + '_'
-        if metric_prefix + 'count' in stats:
+            metric_prefixes += ['rpc_user_users_']
+        for metric_prefix in metric_prefixes:
+            if metric_prefix + 'count' not in stats:
+                stats[metric_prefix + 'count'] = 0
+                stats[metric_prefix + 'total_time'] = 0
             stats[metric_prefix + 'count'] += u_metrics[u'count']
             stats[metric_prefix + 'total_time'] += u_metrics[u'total_time']
-            stats[metric_prefix + 'ave_time'] = \
-                stats[metric_prefix + 'total_time'] / \
-                stats[metric_prefix + 'count']
-        else:
-            stats[metric_prefix + 'count'] = u_metrics[u'count']
-            stats[metric_prefix + 'total_time'] = u_metrics[u'total_time']
             stats[metric_prefix + 'ave_time'] = \
                 stats[metric_prefix + 'total_time'] / \
                 stats[metric_prefix + 'count']
