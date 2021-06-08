@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 EDF SA
+# Copyright (C) 2020-2021 EDF SA
 #
 # Authors: CCN - HPC <dsp-cspit-ccn-hpc@edf.fr>
 #
@@ -97,7 +97,10 @@ def get_stats(debug=False):
     stats["bf_last_depth_cycle_try"] = sdiag.get("bf_last_depth_try")
 
     # RPC users stats
-    for user, u_metrics in sdiag.get("rpc_user_stats").items():
+    rpc_user_stats = sdiag.get('rpc_user_stats')
+    if rpc_user_stats is None:
+        rpc_user_stats = {}
+    for user, u_metrics in rpc_user_stats.items():
         metric_prefixes = ['rpc_user_' + user + '_']
         if user not in ['root', 'slurm']:
             metric_prefixes += ['rpc_user_users_']
@@ -112,7 +115,10 @@ def get_stats(debug=False):
                 stats[metric_prefix + 'count']
 
     # RPC types stats
-    for rpc_type, rpc_metrics in sdiag.get('rpc_type_stats').items():
+    rpc_type_stats = sdiag.get('rpc_type_stats')
+    if rpc_type_stats is None:
+        rpc_type_stats = {}
+    for rpc_type, rpc_metrics in rpc_type_stats.items():
         for m_name, m_value in rpc_metrics.items():
             if m_name != 'id':
                 metric = 'rpc_type_' + str(rpc_type) + '-' + m_name
@@ -120,8 +126,11 @@ def get_stats(debug=False):
 
     # pending RPC by type and sum global pending RPC counter
     metric_global = 'rpc_pending_global'
+    rpc_queue_stats = sdiag.get('rpc_queue_stats')
+    if rpc_queue_stats is None:
+        rpc_queue_stats = {}
     stats[metric_global] = 0
-    for rpc_type, rpc_metrics in sdiag.get('rpc_queue_stats').items():
+    for rpc_type, rpc_metrics in rpc_queue_stats.items():
         stats[metric_global] += rpc_metrics[u'count']
         stats['rpc_pending_' + rpc_type] = rpc_metrics[u'count']
 
@@ -137,6 +146,8 @@ def read():
     else:
         # Dispatch values to collectd
         for k, v in stats.items():
+            if v is None:
+                v = 0
             v_tmp = collectd.Values(plugin='sdiag_stats', type="gauge",
                                     type_instance=k)
             v_tmp.dispatch(values=[v])
@@ -149,17 +160,13 @@ def print_metrics(debug):
     if stats is not None:
         # Dispatch values to collectd
         for k, v in sorted(stats.items()):
+            if v is None:
+                v = 0
             print("sdiag_stats.%-30s -> %d" % (k, v))
 
-
-if __name__ == '__main__':
-    # script is run on cmdline, pretty-print collected metrics
-    import sys
-    debug = False
-    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        debug = True
-    print_metrics(debug)
-else:
-    # script is loaded by collectd, register callback
-    import collectd
-    collectd.register_read(read)
+# Try to register collectd callback
+try:
+  import collectd
+  collectd.register_read(read)
+except ImportError:
+  pass
