@@ -1,11 +1,12 @@
 %global debug_package %{nil}
 %global pypi_name collectd_sdiag
 %global module_name collectd_sdiag
+%define version 2.0
 
 Summary: Collectd SLURM sdiag plugin
 Name: python3-collectd_sdiag
 Version: 2.0
-Release: 1%{?dist}.edf
+Release: 2%{?dist}.edf
 Source0: collectd_sdiag-%{version}.tar.gz
 License: GPLv3
 Group: Application/System
@@ -45,5 +46,7 @@ workload manager on HPC clusters.
 %{python3_sitelib}/%{module_name}-%{version}-py?.?.egg-info
 
 %changelog
+* Fri Jun 11 2021 Thomas HAMEL <thomas-t.hamel@edf.fr> - 2.0-2.el8.edf
+- Set version in a variable
 * Mon Jun 07 2021 Thomas HAMEL <thomas-t.hamel@edf.fr> - 2.0-1.el8.edf
 - Initial RPM packaging
