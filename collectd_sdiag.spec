@@ -5,7 +5,7 @@
 Summary: Collectd SLURM sdiag plugin
 Name: collectd_sdiag
 Version: 2.0
-Release: 3%{?dist}.edf
+Release: 4%{?dist}.edf
 Source0: %{name}-%{version}.tar.gz
 License: GPLv3
 Vendor: EDF CCN HPC <dsp-cspito-ccn-hpc@edf.fr>
@@ -50,6 +50,8 @@ workload manager on HPC clusters.
 %{python3_sitelib}/%{module_name}-%{version}-py?.?.egg-info
 
 %changelog
+* Wed Nov 29 2023 Mathieu Chouquet-Stringer <mathieu-externe.chouquet-stringer@edf.fr> - 2.0-4.el8.edf
+- Rebuild for slurm 23.02
 * Fri Jun 11 2021 Thomas HAMEL <thomas-t.hamel@edf.fr> - 2.0-3.el8.edf
 - Refactor package to work with jenkins package build
 * Fri Jun 11 2021 Thomas HAMEL <thomas-t.hamel@edf.fr> - 2.0-2.el8.edf
